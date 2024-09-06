@@ -79,7 +79,7 @@
 
     "resources": [
         {
-            "type": "[concat(variables('type'),'storageAccounts')]",
+            "type": "Microsoft.Storage/storageAccounts",
             "name": "[parameters('storageAccountName')]",
             "location": "[parameters('location')]",
             "apiVersion": "[variables('apiVersion')]",
@@ -126,7 +126,7 @@
         },
 
         {
-            "type": "[concat(variables('type'),'/storageAccounts/blobServices')]",
+            "type": "Microsoft.Storage//storageAccounts/blobServices",
             "apiVersion": "[variables('apiVersion')]",
             "name": "[concat(parameters('storageAccountName'),'/default')]",
             "dependsOn": [
@@ -154,7 +154,7 @@
         },
 
         {
-            "type": "[concat(variables('type'),'/storageAccounts/fileServices')]",
+            "type": "Microsoft.Storage//storageAccounts/fileServices",
             "apiVersion": "[variables('apiVersion')]",
             "name": "[concat(parameters('storageAccountName'),'/default')]",
             "dependsOn": [
@@ -180,7 +180,7 @@
         },
 
         {
-            "type": "[concat(variables('type'),'/storageAccounts/queueServices')]",
+            "type": "Microsoft.Storage/storageAccounts/queueServices",
             "apiVersion": "[variables('apiVersion')]",
             "name": "[concat(parameters('storageAccountName'),'/default')]",
             "dependsOn": [
@@ -200,7 +200,7 @@
         },
 
         {
-            "type": "[concat(variables('type'),'/storageAccounts/tableServices')]",
+            "type": "Microsoft.Storage/storageAccounts/tableServices",
             "apiVersion": "[variables('apiVersion')]",
             "name": "[concat(parameters('storageAccountName'),'/default')]",
             "dependsOn": [
