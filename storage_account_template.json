@@ -1,0 +1,224 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "type": "string"
+        },
+
+        "location": {
+            "type": "string",
+            "allowedValues": [
+                "eastus",
+                "westus2"
+            ]
+        },
+
+        "skuName": {
+            "type": "string",
+            "defaultValue": "Standard_RAGRS",
+            "allowedValues": [
+                "Standard_RAGRS",
+                "Standard_LRS",
+                "Standard_ZRS"
+            ]
+        },
+
+        "storageTier": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "allowedValues": [
+                "Standard",
+                "Premium"
+            ]
+        },
+
+        "storageType": {
+            "type": "string",
+            "defaultValue": "StorageV2",
+            "allowedValues": [
+                "StorageV2",
+                "FileStorage"
+            ]
+        },
+
+        "accessTier": {
+            "type": "string",
+            "defaultValue": "Cool",
+            "allowedValues": [
+                "Cool",
+                "Hot"
+            ]
+        },
+
+        "defaultToOAuthAuthentication": {
+            "type": "bool"
+        },
+
+        "containerDeleteRetentionPolicy":{
+            "type": "int",
+            "defaultValue": 7
+        },
+
+        "dnsEndpointType": {
+            "type": "string"
+        },
+
+        "publicNetworkAccess": {
+            "type": "string",
+            "defaultValue": "Enabled"
+        }
+    },
+
+    "variables": {
+        "apiVersion": "2023-05-01",
+        "TlsVersion": "TLS1_2",
+        "type": "Microsoft.Storage"
+    },
+
+
+    "resources": [
+        {
+            "type": "[concat(variables('type'),'storageAccounts')]",
+            "name": "[parameters('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "apiVersion": "[variables('apiVersion')]",
+            "sku": {
+                "name": "[parameters('skuName')]",
+                "tier": "[parameters('storageTier')]"
+            },
+            "kind": "[parameters('storageType')]",
+            "properties": {
+                "dnsEndpointType": "[parameters('dnsEndpointType')]",
+                "defaultToOAuthAuthentication": "[parameters('defaultToOAuthAuthentication')]",
+                "publicNetworkAccess": "[parameters('publicNetworkAccess')]",
+                "allowCrossTenantReplication": false,
+                "minimumTlsVersion": "[variables('TlsVersion')]",
+                "allowBlobPublicAccess": false,
+                "allowSharedKeyAccess": false,
+                "largeFileSharesState": "Enabled",
+                "networkACLs": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": false,
+                "encryption": {
+                    "requireInfrastructureEncryption": false,
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "[variables('type')]"
+                },
+                "accessTier": "[parameters('accessTier')]"
+            }
+
+            
+
+        },
+
+        {
+            "type": "[concat(variables('type'),'/storageAccounts/blobServices')]",
+            "apiVersion": "[variables('apiVersion')]",
+            "name": "[concat(parameters('storageAccountName'),'/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "sku": {
+                "name": "[parameters('skuName')]",
+                "tier": "[parameters('storageTier')]"
+            },
+            "properties": {
+                "containerDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "allowPermanentDelete": false,
+                    "enabled": true,
+                    "days": 7
+                }
+            }
+
+        },
+
+        {
+            "type": "[concat(variables('type'),'/storageAccounts/fileServices')]",
+            "apiVersion": "[variables('apiVersion')]",
+            "name": "[concat(parameters('storageAccountName'),'/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "sku": {
+                "name": "[parameters('skuName')]",
+                "tier": "[parameters('storageTier')]"
+            },
+            "properties": {
+                "protocolSettings": {
+                    "smb": {}
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "shareDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                }
+            }
+
+        },
+
+        {
+            "type": "[concat(variables('type'),'/storageAccounts/queueServices')]",
+            "apiVersion": "[variables('apiVersion')]",
+            "name": "[concat(parameters('storageAccountName'),'/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "sku": {
+                "name": "[parameters('skuName')]",
+                "tier": "[parameters('storageTier')]"
+            },
+            "properties": {
+               
+                "cors": {
+                    "corsRules": []
+                }
+            }
+
+        },
+
+        {
+            "type": "[concat(variables('type'),'/storageAccounts/tableServices')]",
+            "apiVersion": "[variables('apiVersion')]",
+            "name": "[concat(parameters('storageAccountName'),'/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+               
+                "cors": {
+                    "corsRules": []
+                }
+            }
+
+        }
+
+        
+
+
+    ]
+
+
+}

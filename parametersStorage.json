@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "value": "gsgaccount"
+        },
+
+        "skuName": {
+            "value": null
+        },
+
+        "location": {
+            "value": "eastus"
+        },
+
+        "storageTier": {
+            "value": "Standard"
+        },
+
+        "defaultToOAuthAuthentication": {
+            "value": true
+        },
+
+        "accessTier": {
+            "value": null
+        },
+
+        "containerDeleteRetentionPolicy": {
+            "value": null
+        },
+
+        "dnsEndpointType": {
+            "value": "Standard"
+        },
+
+        "publicNetworkAccess": {
+            "value": "Enabled"
+        }
+    }
+}
