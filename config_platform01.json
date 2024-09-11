@@ -1,0 +1,25 @@
+{
+    "parameters": {
+        "storageAccountName": {
+            "value": "customaccountname"
+        },
+        "location": {
+            "value": "westus2"
+        },
+        "skuName": {
+            "value": "Standard_LRS"
+        },
+        "storageTier": {
+            "value": "Premium"
+        },
+        "accessTier": {
+            "value": "Hot"
+        },
+        "defaultToOAuthAuthentication": {
+            "value": false
+        },
+        "publicNetworkAccess": {
+            "value": "Disabled"
+        }
+    }
+}
