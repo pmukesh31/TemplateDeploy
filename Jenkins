@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+    
+    environment {
+        // Define Azure Service Principal Credentials stored in Jenkins
+        AZURE_CRED = credentials('jenkins-sp')
+        // GitHub repository URL
+        GITHUB_REPO = 'https://github.com/pmukesh31/TemplateDeploy.git'
+    }
+    
+    stages {
+        stage('Clone Repository') {
+            steps {
+                script {
+                    node {
+                        // Cloning the 'Template' repository from Mike's GitHub
+                        git branch: 'master', url: GITHUB_REPO
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy ARM Template') {
+            steps {
+                script {
+                    node {
+                        echo 'Deploying ARM template...'
+                        // Deploy the ARM template using Azure CLI
+                        bat """
+                        az login --service-principal -u %AZURE_CRED_CLIENT_ID% -p %AZURE_CRED_CLIENT_SECRET% --tenant %AZURE_CRED_TENANT_ID%
+                        """
+                        
+                        bat """
+                        az deployment group create --resource-group DefaultResourceGroup-CID --template-file storage_account_template.json --parameters parametersStorage.json
+                        """
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            script {
+                node {
+                    echo 'Cleaning up workspace...'
+                    cleanWs() // Clean the workspace after the pipeline finishes
+                }
+            }
+        }
+    }
+}
