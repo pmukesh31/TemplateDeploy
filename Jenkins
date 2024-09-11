@@ -38,8 +38,8 @@ pipeline {
                     
                     // Update parameters with config values
                     parametersJson.parameters.each { key, param ->
-                        if (configJson.parameters.containsKey(key)) {
-                            parametersJson.parameters[key].value = configJson.parameters[key].value
+                        if (configJson.containsKey(key)) {
+                            parametersJson.parameters[key].value = configJson[key]
                         }
                     }
                     
