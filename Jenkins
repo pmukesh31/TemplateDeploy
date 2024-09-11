@@ -1,10 +1,12 @@
 pipeline {
     agent any
     
+    parameters {
+        string(name: 'CONFIG_FILE_PATH', defaultValue: 'config_platform01.json', description: 'Path to the JSON configuration file in the repo')
+    }
+    
     environment {
-        // Define Azure Service Principal Credentials stored in Jenkins
         AZURE_CRED = credentials('jenkins-sp')
-        // GitHub repository URL
         GITHUB_REPO = 'https://github.com/pmukesh31/TemplateDeploy.git'
     }
     
@@ -12,10 +14,37 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 script {
-                    node {
-                        // Cloning the 'Template' repository from Mike's GitHub
-                        git branch: 'master', url: GITHUB_REPO
+                    git branch: 'master', url: GITHUB_REPO
+                }
+            }
+        }
+        
+        stage('Read Config File') {
+            steps {
+                script {
+                    def configFilePath = "${params.CONFIG_FILE_PATH}"
+                    def parametersFilePath = 'parametersStorage.json'
+                    
+                    // Read and debug config JSON file
+                    def configFile = readFile(configFilePath)
+                    echo "Config File Content: ${configFile}"
+                    
+                    // Read and debug parameters JSON file
+                    def parametersFile = readFile(parametersFilePath)
+                    echo "Parameters File Content: ${parametersFile}"
+                    
+                    def configJson = readJSON text: configFile
+                    def parametersJson = readJSON text: parametersFile
+                    
+                    // Update parameters with config values
+                    parametersJson.parameters.each { key, param ->
+                        if (configJson.parameters.containsKey(key)) {
+                            parametersJson.parameters[key].value = configJson.parameters[key].value
+                        }
                     }
+                    
+                    // Manually create combined parameters JSON string
+                   writeJSON file: 'parametersStorage.json', json: parametersJson, pretty: 4
                 }
             }
         }
@@ -23,17 +52,15 @@ pipeline {
         stage('Deploy ARM Template') {
             steps {
                 script {
-                    node {
-                        echo 'Deploying ARM template...'
-                        // Deploy the ARM template using Azure CLI
-                        bat """
-                        az login --service-principal -u %AZURE_CRED_CLIENT_ID% -p %AZURE_CRED_CLIENT_SECRET% --tenant %AZURE_CRED_TENANT_ID%
-                        """
-                        
-                        bat """
-                        az deployment group create --resource-group DefaultResourceGroup-CID --template-file storage_account_template.json --parameters parametersStorage.json
-                        """
-                    }
+                    echo 'Deploying ARMs template...'
+                    bat """
+                    az login --service-principal -u %AZURE_CRED_CLIENT_ID% -p %AZURE_CRED_CLIENT_SECRET% --tenant %AZURE_CRED_TENANT_ID%
+                    """
+                    
+                    // Use escaped single quotes to handle JSON string in bat script
+                    bat """
+                    az deployment group create --resource-group DefaultResourceGroup-CID --template-file storage_account_template.json --parameters parametersStorage.json
+                    """
                 }
             }
         }
@@ -42,9 +69,11 @@ pipeline {
     post {
         always {
             script {
-                node {
-                    echo 'Cleaning up workspace...'
+                echo 'Cleaning up workspace...'
+                try {
                     cleanWs() // Clean the workspace after the pipeline finishes
+                } catch (Exception e) {
+                    echo "Failed to clean workspace: ${e.getMessage()}"
                 }
             }
         }
