@@ -1,5 +1,5 @@
 {
-    "storageAccountName": "customaccountname1",
+    "storageAccountName": "customaccountname2",
     "location": "westus2",
     "skuName": "Standard_LRS",
     "storageTier": "Premium",
