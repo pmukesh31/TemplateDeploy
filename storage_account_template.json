@@ -180,7 +180,7 @@
         },
 
         {
-            "type": "Microsoft.Storage/storageAccounts/queueServices",
+            "type": "Microsoft.Storage//storageAccounts/queueServices",
             "apiVersion": "[variables('apiVersion')]",
             "name": "[concat(parameters('storageAccountName'),'/default')]",
             "dependsOn": [
@@ -200,7 +200,7 @@
         },
 
         {
-            "type": "Microsoft.Storage/storageAccounts/tableServices",
+            "type": "Microsoft.Storage//storageAccounts/tableServices",
             "apiVersion": "[variables('apiVersion')]",
             "name": "[concat(parameters('storageAccountName'),'/default')]",
             "dependsOn": [
